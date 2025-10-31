@@ -1,3 +1,6 @@
 /.idea/
 /archives/
 /qodana.yaml
+
+# Development configuration
+**/src/main/resources/application-*.yml

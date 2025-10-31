@@ -1,18 +1,15 @@
-spring:
-  application:
-    name: auth
-  datasource:
-    url: jdbc:postgresql://localhost:5432/authdb
-    username: user
-    password: password
-  jpa:
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-
 server:
   port: 8081
 
-jwt:
-  secret: your-secret-key-here-should-be-at-least-256-bits
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Default to validate for safety, override in profile-specific configs
+    show-sql: false       # Default to false, enable in dev if needed
+    properties:
+      hibernate:
+        format_sql: false  # Default to false, enable in dev if needed

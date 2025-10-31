@@ -1,6 +1,7 @@
-package com.flowforge.auth.config;
+package com.flowforge.workflow.config;
 
-import com.flowforge.auth.service.JwtService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,12 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -41,25 +42,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         try {
-            username = jwtService.extractUsername(jwt);
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey("404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970".getBytes()) // Same secret
+                    .build()
+                    .parseClaimsJws(jwt)
+                    .getBody();
+            username = claims.getSubject();
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                // Since we don't have UserDetailsService for workflow, create a dummy UserDetails
+                UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", Collections.emptyList());
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
-            // Handle exceptions like ExpiredJwtException, SignatureException, etc.
-            // For now, we just let the request continue without authentication.
-            // A proper error response can be configured using an AuthenticationEntryPoint.
+            // Handle exceptions
         }
-        
+
         filterChain.doFilter(request, response);
     }
 }
