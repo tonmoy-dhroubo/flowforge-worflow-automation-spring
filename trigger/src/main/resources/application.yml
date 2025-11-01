@@ -1,3 +1,49 @@
+server:
+  port: 8083
+
 spring:
   application:
-    name: trigger
+    name: trigger-service
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+
+# Kafka Topics Configuration
+kafka:
+  topic:
+    trigger-events: trigger.events
+
+# Plugin Configuration
+plugins:
+  dir: ${PLUGINS_DIR:./plugins/triggers}
+  auto-reload: ${PLUGINS_AUTO_RELOAD:false}
+  scan-interval: ${PLUGINS_SCAN_INTERVAL:60} # seconds
+
+# Logging Configuration
+logging:
+  level:
+    com.flowforge.trigger: DEBUG
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,plugins
+  endpoint:
+    health:
+      show-details: always
