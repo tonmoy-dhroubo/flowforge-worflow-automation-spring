@@ -26,10 +26,12 @@ public class SecurityConfig {
                         // Public endpoints - webhooks need to be accessible without auth
                         .requestMatchers("/webhook/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        // All other endpoints require the X-User-Id header from API Gateway
-                        .anyRequest().authenticated()
+                        // Explicitly permit API calls, as auth is handled by the gateway
+                        .requestMatchers("/api/v1/triggers/**").permitAll()
+                        // Secure everything else by default (if anything else exists)
+                        .anyRequest().denyAll()
                 )
-                .sessionManagement(session -> 
+                .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 

@@ -62,4 +62,24 @@ public class User implements UserDetails {
         return Collections.emptyList();
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Or add logic for account expiration
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Or add logic for account locking
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Or add logic for credentials expiration
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Or use a database field to enable/disable users
+    }
+
 }
