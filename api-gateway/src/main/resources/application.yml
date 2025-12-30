@@ -41,6 +41,30 @@ spring:
               filters:
                 - AuthenticationFilter # Protect management, not webhooks (the filter handles this)
 
+            # Route requests for orchestration/executions to the orchestrator-service
+            - id: orchestrator-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/v1/executions/**
+              filters:
+                - AuthenticationFilter
+
+            # Route requests for executor info/control to the executor-service
+            - id: executor-service
+              uri: http://localhost:8085
+              predicates:
+                - Path=/api/v1/executor/**
+              filters:
+                - AuthenticationFilter
+
+            # Route requests for logs to the log-service
+            - id: log-service
+              uri: http://localhost:8086
+              predicates:
+                - Path=/api/v1/logs/**
+              filters:
+                - AuthenticationFilter
+
           # --- GLOBAL CORS CONFIGURATION ---
           # This allows a web frontend (e.g., from localhost:3000) to call the API
           globalcors:
