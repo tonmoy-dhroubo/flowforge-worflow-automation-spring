@@ -25,7 +25,7 @@ spring:
 application:
   security:
     jwt:
-      secret-key: ${APPLICATION_SECURITY_JWT_SECRET_KEY:dev-secret}
+      secret-key: ${APPLICATION_SECURITY_JWT_SECRET_KEY:dev-secret-key-please-change-dev-secret-key-please-change}
       expiration: ${APPLICATION_SECURITY_JWT_EXPIRATION:86400000}
       refresh-token:
         expiration: ${APPLICATION_SECURITY_JWT_REFRESH_TOKEN_EXPIRATION:604800000}

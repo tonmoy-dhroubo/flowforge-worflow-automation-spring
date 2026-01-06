@@ -84,7 +84,7 @@ application:
   security:
     jwt:
       # THIS SECRET KEY MUST BE THE SAME AS THE ONE IN AUTH-SERVICE
-      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      secret-key: ${APPLICATION_SECURITY_JWT_SECRET_KEY:dev-secret-key-please-change-dev-secret-key-please-change}
 
 # Add this to the end of your api-gateway application.yml
 logging:

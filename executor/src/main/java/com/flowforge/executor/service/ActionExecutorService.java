@@ -24,6 +24,7 @@ public class ActionExecutorService {
             return Mono.just(ExecutionResultDto.builder()
                     .executionId(startDto.getExecutionId())
                     .workflowId(startDto.getWorkflowId())
+                    .userId(startDto.getUserId())
                     .stepIndex(startDto.getStepIndex())
                     .status("FAILURE")
                     .errorMessage(e.getMessage())
@@ -38,6 +39,7 @@ public class ActionExecutorService {
                 .map(output -> ExecutionResultDto.builder()
                         .executionId(startDto.getExecutionId())
                         .workflowId(startDto.getWorkflowId())
+                        .userId(startDto.getUserId())
                         .stepIndex(startDto.getStepIndex())
                         .status("SUCCESS")
                         .output(output).build())
@@ -46,6 +48,7 @@ public class ActionExecutorService {
                     return Mono.just(ExecutionResultDto.builder()
                             .executionId(startDto.getExecutionId())
                             .workflowId(startDto.getWorkflowId())
+                            .userId(startDto.getUserId())
                             .stepIndex(startDto.getStepIndex())
                             .status("FAILURE")
                             .errorMessage(e.getMessage()).build());

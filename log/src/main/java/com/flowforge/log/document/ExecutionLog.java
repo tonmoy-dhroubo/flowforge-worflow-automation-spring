@@ -13,7 +13,9 @@ import java.util.UUID;
 @Document(collection = "execution_logs")
 public class ExecutionLog {
     @Id private String id;
+    private UUID userId;
     private UUID executionId;
+    private UUID eventId;
     private UUID workflowId;
     private String eventType;
     private String status;

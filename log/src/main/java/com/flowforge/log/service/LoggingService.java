@@ -11,11 +11,20 @@ import java.util.UUID;
 @Service @RequiredArgsConstructor @Slf4j
 public class LoggingService {
     private final ExecutionLogRepository repository;
-    public void logEvent(UUID executionId, UUID workflowId, String eventType, String status, Map<String, Object> data) {
+    private final AlertingService alertingService;
+
+    public void logEvent(UUID userId, UUID executionId, UUID eventId, UUID workflowId, String eventType, String status, Map<String, Object> data) {
         repository.save(ExecutionLog.builder()
-                .executionId(executionId).workflowId(workflowId)
+                .userId(userId)
+                .executionId(executionId)
+                .eventId(eventId)
+                .workflowId(workflowId)
                 .eventType(eventType).status(status)
                 .data(data).timestamp(Instant.now()).build());
         log.info("Logged event: {}", eventType);
+
+        if (status != null && status.toUpperCase().contains("FAIL")) {
+            alertingService.onFailure(userId, executionId, eventId, workflowId, eventType, status, data);
+        }
     }
 }

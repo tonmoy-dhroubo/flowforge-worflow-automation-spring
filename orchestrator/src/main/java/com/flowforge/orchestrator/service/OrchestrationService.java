@@ -69,6 +69,11 @@ public class OrchestrationService {
         WorkflowExecution execution = executionRepository.findById(result.getExecutionId())
                 .orElseThrow(() -> new IllegalStateException("WorkflowExecution not found for id: " + result.getExecutionId()));
 
+        if (execution.getStatus() == ExecutionStatus.CANCELLED) {
+            log.warn("Ignoring result for cancelled executionId {} (step {}).", result.getExecutionId(), result.getStepIndex());
+            return;
+        }
+
         if (!"SUCCESS".equalsIgnoreCase(result.getStatus())) {
             log.error("Execution step {} failed for executionId {}. Error: {}", result.getStepIndex(), result.getExecutionId(), result.getErrorMessage());
             execution.setStatus(ExecutionStatus.FAILED);
@@ -96,6 +101,11 @@ public class OrchestrationService {
     }
 
     private void executeStep(WorkflowExecution execution, List<ActionDto> actions) {
+        if (execution.getStatus() == ExecutionStatus.CANCELLED) {
+            log.warn("Execution {} is cancelled; not dispatching further steps.", execution.getId());
+            return;
+        }
+
         int currentStepIndex = execution.getCurrentStep();
 
         if (currentStepIndex >= actions.size()) {
@@ -117,6 +127,7 @@ public class OrchestrationService {
         ExecutionStartDto startDto = ExecutionStartDto.builder()
                 .executionId(execution.getId())
                 .workflowId(execution.getWorkflowId())
+                .userId(execution.getUserId())
                 .stepIndex(currentStepIndex)
                 .actionType(nextAction.getType())
                 .actionConfig(nextAction.getConfig())
