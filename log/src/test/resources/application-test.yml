@@ -1,0 +1,10 @@
+spring:
+  main:
+    lazy-initialization: true
+  kafka:
+    listener:
+      auto-startup: false
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/flowforge_logs_test
+
