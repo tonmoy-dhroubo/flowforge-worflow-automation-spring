@@ -10,6 +10,7 @@ import java.util.UUID;
 public class ExecutionResultDto {
     private UUID executionId;
     private UUID workflowId;
+    private UUID userId;
     private int stepIndex;
     private String status;
     private Map<String, Object> output;

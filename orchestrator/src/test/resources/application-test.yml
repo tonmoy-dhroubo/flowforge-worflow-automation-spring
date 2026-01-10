@@ -1,0 +1,9 @@
+spring:
+  kafka:
+    listener:
+      auto-startup: false
+
+app:
+  services:
+    workflow:
+      url: http://localhost:8082/api/v1

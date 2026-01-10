@@ -19,11 +19,36 @@ public class EventLogConsumer {
     public void consume(ConsumerRecord<String, Object> record) {
         try {
             Map<String, Object> payload = objectMapper.convertValue(record.value(), new TypeReference<>() {});
-            UUID wfId = UUID.fromString((String)payload.get("workflowId"));
-            UUID exId = payload.containsKey("executionId") ? UUID.fromString((String)payload.get("executionId")) : UUID.fromString((String)payload.get("eventId"));
-            String type = record.topic().contains("trigger") ? "TRIGGER" : "RESULT";
-            String status = (String) payload.getOrDefault("status", "INFO");
-            loggingService.logEvent(exId, wfId, type, status, payload);
+
+            boolean isTriggerEvent = record.topic().contains("trigger");
+
+            UUID userId = coerceUuid(payload.get("userId"));
+            if (userId == null) {
+                userId = coerceUuid(payload.get("user_id"));
+            }
+
+            UUID workflowId = coerceUuid(payload.get("workflowId"));
+            UUID executionId = isTriggerEvent ? null : coerceUuid(payload.get("executionId"));
+            UUID eventId = isTriggerEvent ? coerceUuid(payload.get("eventId")) : null;
+
+            String type = isTriggerEvent ? "TRIGGER" : "RESULT";
+            String status = String.valueOf(payload.getOrDefault("status", isTriggerEvent ? "FIRED" : "INFO"));
+
+            loggingService.logEvent(userId, executionId, eventId, workflowId, type, status, payload);
         } catch (Exception e) { log.error("Log error", e); }
+    }
+
+    private UUID coerceUuid(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof UUID uuid) {
+            return uuid;
+        }
+        try {
+            return UUID.fromString(String.valueOf(value));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 }

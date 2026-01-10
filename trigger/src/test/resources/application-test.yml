@@ -1,0 +1,6 @@
+scheduler:
+  enabled: false
+
+email:
+  polling:
+    enabled: false

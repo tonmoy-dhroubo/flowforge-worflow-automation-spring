@@ -10,6 +10,7 @@ import java.util.UUID;
 public class ExecutionStartDto {
     private UUID executionId;
     private UUID workflowId;
+    private UUID userId;
     private int stepIndex;
     private String actionType;
     private Map<String, Object> actionConfig;
